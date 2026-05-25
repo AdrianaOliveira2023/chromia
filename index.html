@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+
+    <title>Chromia — Extrator de Paletas</title>
+
+    <link
+      rel="stylesheet"
+      href="style.css"
+    />
+  </head>
+
+  <body>
+    <div class="container">
+      <!-- ESQUERDA -->
+      <div class="panel left-panel">
+        <h1>Chromia</h1>
+
+        <p>
+          Transformando imagens em harmonia de cores.
+        </p>
+
+        <label
+          class="upload"
+          id="dropZone"
+        >
+          <input
+            type="file"
+            id="imageInput"
+            accept="image/*"
+          />
+
+          <div class="upload-content">
+            <span class="upload-text">
+              Arraste uma imagem ou clique para selecionar
+            </span>
+
+            <small>
+              PNG, JPG e WEBP
+            </small>
+          </div>
+        </label>
+
+        <div class="preview-wrapper">
+          <canvas id="imageCanvas"></canvas>
+        </div>
+      </div>
+
+      <!-- DIREITA -->
+      <div class="panel right-panel">
+        <div class="header-row">
+          <h2>Paleta</h2>
+
+          <div class="controls">
+            <div class="color-limit">
+              <label for="colorCount">
+                Cores
+              </label>
+
+              <select id="colorCount">
+                <option value="5">
+                  5
+                </option>
+
+                <option value="10">
+                  10
+                </option>
+
+                <option
+                  value="15"
+                  selected
+                >
+                  15
+                </option>
+
+                <option value="20">
+                  20
+                </option>
+
+                <option value="25">
+                  25
+                </option>
+
+                <option value="30">
+                  30
+                </option>
+
+                <option value="35">
+                  35
+                </option>
+
+                <option value="40">
+                  40
+                </option>
+
+                <option value="45">
+                  45
+                </option>
+
+                <option value="50">
+                  50
+                </option>
+
+              </select>
+            </div>
+
+            <button id="clearPalette">
+              Limpar
+            </button>
+          </div>
+        </div>
+
+        <div
+          class="palette-grid"
+          id="palette"
+        ></div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
