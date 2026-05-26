@@ -1,26 +1,13 @@
-/* =========================
-   ELEMENTOS
-========================= */
-
-const imageInput = document.getElementById("imageInput");
-const dropZone = document.getElementById("dropZone");
-const canvas = document.getElementById("imageCanvas");
-const ctx = canvas.getContext("2d");
-
-const palette = document.getElementById("palette");
-const clearButton = document.getElementById("clearPalette");
-const colorCount = document.getElementById("colorCount");
-
-/* =========================
-   ESTADO
-========================= */
+const imageInput = document.getElementById('imageInput');
+const dropZone = document.getElementById('dropZone');
+const canvas = document.getElementById('imageCanvas');
+const ctx = canvas.getContext('2d');
+const palette = document.getElementById('palette');
+const clearButton = document.getElementById('clearPalette');
+const colorCount = document.getElementById('colorCount');
 
 let selectedColors = [];
 let maxColors = 15;
-
-/* =========================
-   CANVAS CONFIG
-========================= */
 
 canvas.width = 600;
 canvas.height = 600;
@@ -29,7 +16,7 @@ canvas.height = 600;
    INIT
 ========================= */
 
-window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener('DOMContentLoaded', () => {
   maxColors = Number(colorCount.value);
 });
 
@@ -37,7 +24,7 @@ window.addEventListener("DOMContentLoaded", () => {
    INPUT NORMAL
 ========================= */
 
-imageInput.addEventListener("change", (event) => {
+imageInput.addEventListener('change', (event) => {
   const file = event.target.files[0];
 
   if (!file) return;
@@ -49,26 +36,26 @@ imageInput.addEventListener("change", (event) => {
    DRAG AND DROP
 ========================= */
 
-dropZone.addEventListener("dragover", (event) => {
+dropZone.addEventListener('dragover', (event) => {
   event.preventDefault();
-  dropZone.classList.add("dragover");
+  dropZone.classList.add('dragover');
 });
 
-dropZone.addEventListener("dragleave", () => {
-  dropZone.classList.remove("dragover");
+dropZone.addEventListener('dragleave', () => {
+  dropZone.classList.remove('dragover');
 });
 
-dropZone.addEventListener("drop", (event) => {
+dropZone.addEventListener('drop', (event) => {
   event.preventDefault();
 
-  dropZone.classList.remove("dragover");
+  dropZone.classList.remove('dragover');
 
   const file = event.dataTransfer.files[0];
 
   if (!file) return;
 
-  if (!file.type.startsWith("image/")) {
-    showToast("Arquivo inválido");
+  if (!file.type.startsWith('image/')) {
+    showToast('Arquivo inválido');
     return;
   }
 
@@ -79,7 +66,7 @@ dropZone.addEventListener("drop", (event) => {
    QUANTIDADE DE CORES
 ========================= */
 
-colorCount.addEventListener("change", () => {
+colorCount.addEventListener('change', () => {
   maxColors = Number(colorCount.value);
 
   requestAnimationFrame(() => {
@@ -148,22 +135,37 @@ function generatePalette() {
   );
 
   const colorMap = {};
-
   const step = 6;
   const len = pixels.length;
 
   for (let i = 0; i < len; i += 4 * step) {
     const alpha = pixels[i + 3];
 
+    // ignora transparência
     if (alpha < 120) continue;
 
     const r = pixels[i];
     const g = pixels[i + 1];
     const b = pixels[i + 2];
 
-    const roundedR = Math.round(r / 16) * 16;
-    const roundedG = Math.round(g / 16) * 16;
-    const roundedB = Math.round(b / 16) * 16;
+    /* =========================
+       QUANTIZAÇÃO SEGURA
+    ========================= */
+
+    const roundedR = Math.min(
+      255,
+      Math.floor(r / 16) * 16
+    );
+
+    const roundedG = Math.min(
+      255,
+      Math.floor(g / 16) * 16
+    );
+
+    const roundedB = Math.min(
+      255,
+      Math.floor(b / 16) * 16
+    );
 
     const hex = rgbToHex(
       roundedR,
@@ -171,16 +173,22 @@ function generatePalette() {
       roundedB
     );
 
-    colorMap[hex] = (colorMap[hex] || 0) + 1;
+    colorMap[hex] =
+      (colorMap[hex] || 0) + 1;
   }
 
+  /* =========================
+     ORGANIZAÇÃO DA PALETA
+  ========================= */
+
   selectedColors = Object.entries(colorMap)
-    .sort((a, b) => b[1] - a[1])
+    .sort((a, b) => b[1] - a[1]) // frequência
     .map(([hex]) => hex)
     .slice(0, maxColors)
     .sort(
       (a, b) =>
-        getBrightness(b) - getBrightness(a)
+        getBrightness(b) -
+        getBrightness(a)
     );
 
   renderPalette();
@@ -190,7 +198,7 @@ function generatePalette() {
    LIMPAR
 ========================= */
 
-clearButton.addEventListener("click", () => {
+clearButton.addEventListener('click', () => {
   selectedColors = [];
 
   renderPalette();
@@ -201,69 +209,84 @@ clearButton.addEventListener("click", () => {
 ========================= */
 
 function renderPalette() {
-  palette.innerHTML = "";
+  palette.innerHTML = '';
 
-  selectedColors.forEach((color, index) => {
-    const card = document.createElement("div");
+  palette.style.maxHeight = '800px';
+  palette.style.overflowY = 'auto';
 
-    card.className = "color-card";
+  selectedColors.forEach(
+    (color, index) => {
+      const card =
+        document.createElement('div');
 
-    card.innerHTML = `
-      <div 
-        class="color-preview" 
-        style="background:${color}"
-      ></div>
+      card.className = 'color-card';
 
-      <div class="color-info">
-        <span>${color}</span>
-
-        <div class="actions">
-          <button 
-            class="copy-btn" 
-            data-color="${color}"
-          >
-            ⧉
-          </button>
-
-          <button 
-            class="remove-btn" 
-            data-index="${index}"
-          >
-            ✕
-          </button>
+      card.innerHTML = `
+        <div 
+          class="color-preview" 
+          style="background:${color}">
         </div>
-      </div>
-    `;
 
-    palette.appendChild(card);
-  });
+        <div class="color-info">
+          <span>${color}</span>
+
+          <div class="actions">
+            <button 
+              class="copy-btn" 
+              data-color="${color}">
+              ⧉
+            </button>
+
+            <button 
+              class="remove-btn" 
+              data-index="${index}">
+              ✕
+            </button>
+          </div>
+        </div>
+      `;
+
+      palette.appendChild(card);
+    }
+  );
 }
 
 /* =========================
    EVENTOS PALETA
 ========================= */
 
-palette.addEventListener("click", (event) => {
-  const copyBtn = event.target.closest(".copy-btn");
+palette.addEventListener(
+  'click',
+  (event) => {
+    const copyBtn =
+      event.target.closest('.copy-btn');
 
-  if (copyBtn) {
-    const color = copyBtn.dataset.color;
+    if (copyBtn) {
+      const color =
+        copyBtn.dataset.color;
 
-    navigator.clipboard.writeText(color);
+      navigator.clipboard.writeText(
+        color
+      );
 
-    showToast(`${color} copiada`);
+      showToast(`${color} copiada`);
+    }
+
+    const removeBtn =
+      event.target.closest(
+        '.remove-btn'
+      );
+
+    if (removeBtn) {
+      const index =
+        removeBtn.dataset.index;
+
+      selectedColors.splice(index, 1);
+
+      renderPalette();
+    }
   }
-
-  const removeBtn = event.target.closest(".remove-btn");
-
-  if (removeBtn) {
-    const index = removeBtn.dataset.index;
-
-    selectedColors.splice(index, 1);
-
-    renderPalette();
-  }
-});
+);
 
 /* =========================
    RGB -> HEX
@@ -271,12 +294,20 @@ palette.addEventListener("click", (event) => {
 
 function rgbToHex(r, g, b) {
   return (
-    "#" +
+    '#' +
     [r, g, b]
-      .map((v) =>
-        v.toString(16).padStart(2, "0")
-      )
-      .join("")
+      .map((v) => {
+        // segurança extra
+        const safe = Math.max(
+          0,
+          Math.min(255, v)
+        );
+
+        return safe
+          .toString(16)
+          .padStart(2, '0');
+      })
+      .join('')
       .toUpperCase()
   );
 }
@@ -302,7 +333,10 @@ function getBrightness(hex) {
   );
 
   return (
-    (r * 299 + g * 587 + b * 114) / 1000
+    (r * 299 +
+      g * 587 +
+      b * 114) /
+    1000
   );
 }
 
@@ -311,19 +345,20 @@ function getBrightness(hex) {
 ========================= */
 
 function showToast(message) {
-  const toast = document.createElement("div");
+  const toast =
+    document.createElement('div');
 
-  toast.className = "toast";
+  toast.className = 'toast';
   toast.textContent = message;
 
   document.body.appendChild(toast);
 
   setTimeout(() => {
-    toast.classList.add("show");
+    toast.classList.add('show');
   }, 10);
 
   setTimeout(() => {
-    toast.classList.remove("show");
+    toast.classList.remove('show');
 
     setTimeout(() => {
       toast.remove();
