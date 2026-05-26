@@ -358,7 +358,7 @@ function showToast(message) {
   }, 10);
 
   setTimeout(() => {
-    toast.classList.remove('show');
+    toast.classList.remove('show');   
 
     setTimeout(() => {
       toast.remove();
