@@ -10,7 +10,6 @@ Ferramenta desenvolvida para extrair cores de fotografias e utilizá-las em iden
 - Upload por clique ou arrastar e soltar
 - Cópia rápida de códigos HEX
 - Interface responsiva
-- Glassmorphism + Neumorfismo
 
 ## 🖼️ Como funciona
 
